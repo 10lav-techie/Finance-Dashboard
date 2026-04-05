@@ -66,13 +66,23 @@ function AddTransactionForm({ onAdd }) {
         <option value="income">Income</option>
       </select>
 
-      <input
-        type="date"
-        name="date"
-        value={form.date}
-        onChange={handleChange}
-        className="border p-2 rounded w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-      />
+        <div className="flex flex-col">
+        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+            Date
+        </label>
+
+        <input
+            type="date"
+            value={form.date}
+            onChange={(e) =>
+            setForm({ ...form, date: e.target.value })
+            }
+            className="border border-gray-300 dark:border-gray-600 
+                    p-2 rounded 
+                    bg-white dark:bg-gray-700 
+                    text-gray-800 dark:text-white"
+        />
+        </div>
 
       <Button onClick={handleSubmit}>Add</Button>
     </div>
