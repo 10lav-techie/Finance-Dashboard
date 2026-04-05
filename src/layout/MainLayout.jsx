@@ -138,7 +138,7 @@ function MainLayout({ children, dark, setDark, role, setRole }) {
 
             {/* 👤 Avatar */}
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
-              A
+              L
             </div>
 
           </div>
