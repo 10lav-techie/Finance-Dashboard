@@ -28,7 +28,7 @@ function MainLayout({ children, dark, setDark, role, setRole }) {
       <aside className="w-64 bg-indigo-900 text-white p-5 flex flex-col justify-between">
 
         <div>
-          <h1 className="text-xl font-bold mb-6">FinApp</h1>
+          <h1 className="text-xl font-bold mb-6">FinBoard</h1>
 
           <nav className="flex flex-col gap-2">
             <Link to="/" className="hover:bg-indigo-700 p-2 rounded">
