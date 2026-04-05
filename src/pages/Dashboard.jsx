@@ -5,19 +5,24 @@ import Insights from "../components/insights/Insights";
 
 function Dashboard() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 text-gray-800 dark:text-gray-100">
 
       {/* Summary Cards */}
       <SummaryCards />
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        <div className="md:col-span-2">
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+
+        {/* Balance Chart */}
+        <div className="lg:col-span-2 h-full">
           <BalanceChart />
         </div>
 
-        <CategoryChart />
+        {/* Category Chart */}
+        <div className="h-full">
+          <CategoryChart />
+        </div>
+
       </div>
 
       {/* Insights */}

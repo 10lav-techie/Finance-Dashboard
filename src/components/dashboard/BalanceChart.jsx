@@ -5,16 +5,28 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Dot,
 } from "recharts";
 import { useStore } from "../../store/useStore";
 import { filterByTime } from "../../utils/filterByTime";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function BalanceChart() {
   const { transactions, timeFilter } = useStore();
 
-  const [view, setView] = useState("both"); // income | expense | both
+  const [view, setView] = useState("both");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 🔥 Detect mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const filtered = filterByTime(transactions, timeFilter);
 
@@ -40,7 +52,7 @@ function BalanceChart() {
     map[t.date].transactions.push(t);
   });
 
-  // 🔹 Build chart data
+  // 🔹 Chart data
   const data = Object.values(map).map((d) => ({
     ...d,
     amount:
@@ -51,31 +63,28 @@ function BalanceChart() {
         : d.income - d.expense,
   }));
 
-  // 🔹 Custom dot color
-  const CustomDot = (props) => {
-    const { cx, cy, payload } = props;
-
+  // 🔹 Dot color
+  const CustomDot = ({ cx, cy, payload }) => {
     const color =
       payload.income > payload.expense ? "#22c55e" : "#ef4444";
 
     return <circle cx={cx} cy={cy} r={5} fill={color} />;
   };
 
-  // 🔹 Custom tooltip
+  // 🔹 Tooltip (desktop only)
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload;
+      const d = payload[0].payload;
 
       return (
         <div className="bg-white dark:bg-gray-800 p-3 rounded shadow text-sm">
-          <p className="font-semibold">{data.date}</p>
-
-          <p className="text-green-500">Income: ₹{data.income}</p>
-          <p className="text-red-500">Expense: ₹{data.expense}</p>
+          <p className="font-semibold">{formatDate(d.date)}</p>
+          <p className="text-green-500">Income: ₹{d.income}</p>
+          <p className="text-red-500">Expense: ₹{d.expense}</p>
 
           <div className="mt-2">
             <p className="font-medium">Transactions:</p>
-            {data.transactions.map((t) => (
+            {d.transactions.map((t) => (
               <div key={t.id} className="flex justify-between gap-3">
                 <span>{t.category}</span>
                 <span>₹{t.amount}</span>
@@ -85,18 +94,24 @@ function BalanceChart() {
         </div>
       );
     }
-
     return null;
   };
+    const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
 
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = String(d.getFullYear()).slice(-2); // 👈 last 2 digits
+
+    return `${day}/${month}/${year}`;
+    };
   return (
     <div className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-4 rounded-2xl shadow">
-      
+
       {/* Header */}
       <div className="flex justify-between items-center mb-2">
         <h2 className="font-semibold">Balance Trend</h2>
 
-        {/* 🔥 Filter */}
         <select
           value={view}
           onChange={(e) => setView(e.target.value)}
@@ -109,11 +124,24 @@ function BalanceChart() {
       </div>
 
       {/* Chart */}
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip content={<CustomTooltip />} />
+      <ResponsiveContainer width="100%" height={isMobile ? 220 : 300}>
+        <LineChart
+          data={data}
+          margin={
+            isMobile
+              ? { top: 10, right: 10, left: -25, bottom: 0 } // 🔥 mobile fix
+              : { top: 10, right: 20, left: 0, bottom: 0 }
+          }
+        >
+            <XAxis
+            dataKey="date"
+            tickFormatter={formatDate}
+            tick={{ fontSize: isMobile ? 9 : 12 }}
+            interval="preserveStartEnd"
+            />
+          <YAxis tick={{ fontSize: isMobile ? 9 : 12 }} />
+
+          {!isMobile && <Tooltip content={<CustomTooltip />} />}
 
           <Line
             type="monotone"
@@ -123,6 +151,31 @@ function BalanceChart() {
           />
         </LineChart>
       </ResponsiveContainer>
+
+      {/* 🔥 MOBILE DATA VIEW */}
+      {isMobile && (
+        <div className="mt-3 text-xs space-y-2 max-h-60 overflow-y-auto pr-1">
+          {data.map((d, i) => (
+            <div key={i} className="border-b pb-2">
+
+              <p className="font-medium">{d.date}</p>
+
+              <p className="text-green-500">
+                Income: ₹{d.income}
+              </p>
+
+              <p className="text-red-500">
+                Expense: ₹{d.expense}
+              </p>
+
+              <p className="text-gray-500">
+                Net: ₹{d.income - d.expense}
+              </p>
+
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

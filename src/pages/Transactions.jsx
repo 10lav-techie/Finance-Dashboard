@@ -14,11 +14,13 @@ function Transactions() {
   const { addTransaction, role } = useStore();
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 text-gray-800 dark:text-gray-100">
 
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Transactions</h2>
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+          Transactions
+        </h2>
 
         {role === "admin" && (
           <Button onClick={() => setShowForm(!showForm)}>
@@ -39,7 +41,10 @@ function Transactions() {
 
         {/* Filter */}
         <select
-          className="border p-2 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+          className="border border-gray-300 dark:border-gray-600 
+                     p-2 rounded-lg 
+                     bg-white dark:bg-gray-700 
+                     text-gray-800 dark:text-white"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
@@ -52,7 +57,9 @@ function Transactions() {
 
       {/* Add Form */}
       {role === "admin" && showForm && (
-        <AddTransactionForm onAdd={addTransaction} />
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+          <AddTransactionForm onAdd={addTransaction} />
+        </div>
       )}
 
       {/* Table */}

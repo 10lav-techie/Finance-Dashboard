@@ -1,16 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../store/useStore";
 import { filterByTime } from "../utils/filterByTime";
 import Button from "../components/ui/Button";
+
 function MainLayout({ children, dark, setDark, role, setRole }) {
+  const [open, setOpen] = useState(false);
 
   // 🔹 Global state
   const { transactions, timeFilter, setTimeFilter, resetData } = useStore();
 
-  // 🔹 Filtered data based on time
+  // 🔹 Filtered data
   const filtered = filterByTime(transactions, timeFilter);
 
-  // 🔹 Calculate summary
   const income = filtered
     .filter((t) => t.type === "income")
     .reduce((a, t) => a + t.amount, 0);
@@ -22,11 +24,18 @@ function MainLayout({ children, dark, setDark, role, setRole }) {
   const balance = income - expense;
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
 
       {/* 🔹 Sidebar */}
-      <aside className="w-64 bg-indigo-900 text-white p-5 flex flex-col justify-between">
-
+      <aside
+        className={`
+          fixed md:static z-50
+          top-0 left-0 h-full w-64
+          bg-indigo-900 text-white p-5 flex flex-col justify-between
+          transform ${open ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0 transition-transform duration-300
+        `}
+      >
         <div>
           <h1 className="text-xl font-bold mb-6">FinBoard</h1>
 
@@ -38,86 +47,105 @@ function MainLayout({ children, dark, setDark, role, setRole }) {
             <Link to="/transactions" className="hover:bg-indigo-700 p-2 rounded">
               Transactions
             </Link>
+
             <Link to="/scheduled" className="hover:bg-indigo-700 p-2 rounded">
-            Upcoming Payments
+              Upcoming Payments
             </Link>
           </nav>
         </div>
 
         {/* Bottom controls */}
-        {/* Bottom controls */}
         <div className="space-y-3">
 
-        {/* Role */}
-        <select
+          {/* Role */}
+          <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
             className="w-full p-2 rounded text-black"
-        >
+          >
             <option value="viewer">Viewer</option>
             <option value="admin">Admin</option>
-        </select>
+          </select>
 
-        {/* Dark mode */}
-        <button
+          {/* Dark mode */}
+          <button
             onClick={() => setDark(!dark)}
             className="w-full bg-indigo-700 p-2 rounded"
-        >
+          >
             {dark ? "Light Mode" : "Dark Mode"}
-        </button>
+          </button>
 
-        {/* 🔥 Reset Demo Button */}
-        <Button onClick={resetData}>
+          {/* Reset */}
+          <Button onClick={resetData}>
             Reset Demo
-        </Button>
-
+          </Button>
         </div>
       </aside>
 
+      {/* 🔹 Overlay (mobile) */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/30 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
       {/* 🔹 Right side */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* 🔹 Topbar */}
-        <header className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-6 py-4 shadow-sm flex justify-between items-center">
+        <header className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 md:px-6 py-3 md:py-4 shadow-sm flex justify-between items-center">
 
           {/* Left */}
-          <div>
-            <h2 className="text-lg font-semibold">Dashboard</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Overview of your finances
-            </p>
+          <div className="flex items-center gap-3">
+            {/* Hamburger */}
+            <button
+              className="md:hidden text-xl"
+              onClick={() => setOpen(true)}
+            >
+              ☰
+            </button>
+
+            <div>
+              <h2 className="text-lg font-semibold">Dashboard</h2>
+              <p className="hidden md:block text-sm text-gray-500 dark:text-gray-400">
+                Overview of your finances
+              </p>
+            </div>
           </div>
 
           {/* Right */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
 
             {/* 🧠 Mini Summary */}
-            <div className="text-sm text-right">
+            <div className="text-xs md:text-sm text-right">
               <p className="font-medium">₹{balance}</p>
-              <p className="text-red-500 text-xs">Spent ₹{expense}</p>
+              <p className="text-red-500 text-[10px] md:text-xs">
+                Spent ₹{expense}
+              </p>
             </div>
 
             {/* 📅 Time Filter */}
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
-              className="border p-2 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+              className="border p-1 md:p-2 rounded text-xs md:text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             >
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="year">This Year</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
             </select>
 
             {/* 👤 Avatar */}
-            <div className="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
               A
             </div>
 
           </div>
         </header>
 
-        {/* 🔹 Main Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* 🔹 Content */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
 

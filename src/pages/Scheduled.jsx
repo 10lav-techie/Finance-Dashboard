@@ -31,29 +31,36 @@ function Scheduled() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 text-gray-800 dark:text-gray-100">
 
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold">Schedule Your Upcoming Payments</h2>
+        <h2 className="text-lg font-semibold">
+          Schedule Your Upcoming Payments
+        </h2>
 
         {role === "viewer" && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             You are in view-only mode
           </p>
         )}
       </div>
 
-      {/* 🔹 Admin Only Form */}
+      {/* 🔹 Admin Form */}
       {role === "admin" && (
         <div className="flex flex-wrap gap-2">
+
           <input
             placeholder="Category (e.g. Rent)"
             value={form.category}
             onChange={(e) =>
               setForm({ ...form, category: e.target.value })
             }
-            className="border p-2 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+            className="border border-gray-300 dark:border-gray-600 
+                       p-2 rounded 
+                       bg-white dark:bg-gray-700 
+                       text-gray-800 dark:text-white 
+                       placeholder-gray-400 dark:placeholder-gray-300"
           />
 
           <input
@@ -63,7 +70,11 @@ function Scheduled() {
             onChange={(e) =>
               setForm({ ...form, amount: e.target.value })
             }
-            className="border p-2 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+            className="border border-gray-300 dark:border-gray-600 
+                       p-2 rounded 
+                       bg-white dark:bg-gray-700 
+                       text-gray-800 dark:text-white 
+                       placeholder-gray-400 dark:placeholder-gray-300"
           />
 
           <input
@@ -72,34 +83,45 @@ function Scheduled() {
             onChange={(e) =>
               setForm({ ...form, date: e.target.value })
             }
-            className="border p-2 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+            className="border border-gray-300 dark:border-gray-600 
+                       p-2 rounded 
+                       bg-white dark:bg-gray-700 
+                       text-gray-800 dark:text-white"
           />
 
           <Button onClick={handleAdd}>Add</Button>
         </div>
       )}
 
-      {/* 🔹 Scheduled List */}
+      {/* 🔹 List */}
       <div className="space-y-3">
         {scheduledPayments.length === 0 ? (
-          <p className="text-gray-500">No scheduled payments</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No scheduled payments
+          </p>
         ) : (
           scheduledPayments.map((p) => (
             <div
               key={p.id}
-              className="flex justify-between items-center border p-3 rounded-lg bg-white dark:bg-gray-800"
+              className="flex justify-between items-center 
+                         border border-gray-200 dark:border-gray-700 
+                         p-3 rounded-lg 
+                         bg-white dark:bg-gray-800"
             >
               {/* Left */}
               <div>
-                <p className="font-medium">{p.category}</p>
-                <p className="text-sm text-gray-500">
+                <p className="font-medium text-gray-800 dark:text-gray-100">
+                  {p.category}
+                </p>
+
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   ₹{p.amount} • {p.date}
                 </p>
               </div>
 
               {/* Right */}
               <div className="flex items-center gap-2">
-                
+
                 {role === "admin" ? (
                   <>
                     <Button onClick={() => completeScheduled(p.id)}>
@@ -108,13 +130,13 @@ function Scheduled() {
 
                     <button
                       onClick={() => deleteScheduled(p.id)}
-                      className="text-red-500 hover:underline"
+                      className="text-red-500 dark:text-red-400 hover:underline"
                     >
                       Cancel
                     </button>
                   </>
                 ) : (
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm text-gray-400 dark:text-gray-500">
                     View Only
                   </span>
                 )}
